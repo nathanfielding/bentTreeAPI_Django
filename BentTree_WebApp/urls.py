@@ -15,7 +15,11 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from BentTree_API.views import *
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+
+    # tenant endpoints
+    path('tenants/', TenantList.as_view()),
 ]
