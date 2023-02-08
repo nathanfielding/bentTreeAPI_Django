@@ -16,10 +16,21 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from BentTree_API.views import *
+from rest_framework.urlpatterns import format_suffix_patterns
 
 urlpatterns = [
     path('admin/', admin.site.urls),
 
-    # tenant endpoints
-    path('tenants/', TenantList.as_view()),
+    #tenant endpoints
+    path("tenants/", TenantList.as_view()),
+    path("tenants/by-name/<str:name>", TenantByName.as_view()),
+    path("tenants/by-apartment/", TenantsByApartment.as_view()), #ex: by-apartment/?apartment_id__number=101
+    
+
+    #apartment endpoints
+    path("apartments/", ApartmentList.as_view()),
+    path("apartments/by-number/<str:number>", ApartmentByNumber.as_view()),
+    # path("apartments/by-end-date/", ApartmentsByEndDate.as_view()) # ex: by-end-date/?end_date=2023-06-05
 ]
+
+urlpatterns = format_suffix_patterns(urlpatterns)

@@ -11,6 +11,7 @@ class Apartment(models.Model):
 class Tenant(models.Model):
     id = models.AutoField(primary_key=True)
     apartment_id = models.ForeignKey(Apartment, on_delete=models.PROTECT, null=False, blank=False)
+    lease_id = models.OneToOneField('Lease', on_delete=models.CASCADE, null=False, blank=False)
     name = models.CharField(max_length=50, unique=True, null=False, blank=False)
     email = models.CharField(max_length=50, unique=True, null=False, blank=False)
     phone_number = models.CharField(max_length=50, unique=True, null=False, blank=False)
@@ -22,13 +23,16 @@ class Tenant(models.Model):
 
 class Lease(models.Model):
     id = models.AutoField(primary_key=True)
-    tenant_id = models.ForeignKey(Tenant, on_delete=models.PROTECT, null=False, blank=False)
+    tenant_id = models.OneToOneField(Tenant, on_delete=models.PROTECT, null=True, blank=False)
     aparment_id = models.ForeignKey(Apartment, on_delete=models.PROTECT, null=False, blank=False)
     start_date = models.DateField(null=False, blank=False)
     end_date = models.DateField(null=False, blank=False)
     monthly_rent = models.DecimalField(max_digits=10, decimal_places=2, null=False, blank=False)
     deposit_amount = models.DecimalField(max_digits=10, decimal_places=2, null=False, blank=False)
     copy_of_lease = models.FileField(upload_to='lease_files/', null=False)
+
+    def __str__(self):
+        return self.tenant_id.name
 
 class MaintenanceRequest(models.Model):
     id = models.AutoField(primary_key=True)
