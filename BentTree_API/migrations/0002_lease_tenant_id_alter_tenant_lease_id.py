@@ -21,4 +21,9 @@ class Migration(migrations.Migration):
             name='lease_id',
             field=models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to='BentTree_API.lease'),
         ),
+        migrations.AddField(
+            model_name='apartment',
+            name='property',
+            field=models.CharField(max_length=50, null=False),
+        )
     ]

@@ -3,6 +3,7 @@ from django.db import models
 class Apartment(models.Model):
     id = models.AutoField(primary_key=True)
     number = models.CharField(max_length=50, unique=True, null=False)
+    property = models.CharField(max_length=50, null=False)
     occupancy = models.IntegerField(null=False)
 
     def __str__(self):

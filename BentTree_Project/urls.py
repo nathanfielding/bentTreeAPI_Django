@@ -15,22 +15,22 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from BentTree_API.views import *
-from rest_framework.urlpatterns import format_suffix_patterns
+from BentTree_API import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
 
-    #tenant endpoints
-    path("tenants/", TenantList.as_view()),
-    path("tenants/by-name/<str:name>", TenantByName.as_view()),
-    path("tenants/by-apartment/", TenantsByApartment.as_view()), #ex: by-apartment/?apartment_id__number=101
-    
+    # tenant endpoints
+    path("tenants/", views.tenant_list),
+    path("tenants/by-name/<str:name>/", views.tenant_by_name),
+    path("tenants/by-apartment/<str:number>/", views.tenants_by_aparment),
 
-    #apartment endpoints
-    path("apartments/", ApartmentList.as_view()),
-    path("apartments/by-number/<str:number>", ApartmentByNumber.as_view()),
-    # path("apartments/by-end-date/", ApartmentsByEndDate.as_view()) # ex: by-end-date/?end_date=2023-06-05
+    # apartment endpoints
+    path("apartments/", views.apartment_list),
+    path("apartments/by-number/<str:number>/", views.apartment_by_number),
+    path("apartments/by-end-date/<str:end_date>/", views.apartments_by_end_date),
+
+    # lease endpoints
+    path("leases/", views.lease_list),
+    path("leases/by-name/<str:name>", views.lease_by_tenant)
 ]
-
-urlpatterns = format_suffix_patterns(urlpatterns)

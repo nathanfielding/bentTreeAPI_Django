@@ -60,7 +60,7 @@ coverage.xml
 local_settings.py
 db.sqlite3
 db.sqlite3-journal
-BentTree_WebApp/settings.py
+BentTree_Project/settings.py
 
 # Flask stuff:
 instance/
