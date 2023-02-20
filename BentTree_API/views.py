@@ -4,23 +4,25 @@ from rest_framework.decorators import api_view
 from .serializers import TenantSerializer, ApartmentSerializer, LeaseSerializer
 from .models import Tenant, Apartment, Lease
 
-@api_view(["GET", "POST"])
-def tenant_list(request):
-    if request.method == "GET":
-        tenants = Tenant.objects.all()
-        serializer = TenantSerializer(tenants, many=True)
-        return Response(serializer.data)
-    
-    elif request.method == "POST":
-        serializer = TenantSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=201)
-        return Response(serializer.errors, status=400)
+##### START OF TENANT VIEWS #####
 
-# class TenantList(generics.ListCreateAPIView):
-#     queryset = Tenant.objects.all()
-#     serializer_class = TenantSerializer
+# @api_view(["GET", "POST"])
+# def tenant_list(request):
+#     if request.method == "GET":
+#         tenants = Tenant.objects.all()
+#         serializer = TenantSerializer(tenants, many=True)
+#         return Response(serializer.data)
+    
+#     elif request.method == "POST":
+#         serializer = TenantSerializer(data=request.data)
+#         if serializer.is_valid():
+#             serializer.save()
+#             return Response(serializer.data, status=201)
+#         return Response(serializer.errors, status=400)
+
+class TenantList(generics.ListCreateAPIView):
+    queryset = Tenant.objects.all()
+    serializer_class = TenantSerializer
 
 
 @api_view(["GET", "PUT", "PATCH", "DELETE"])
@@ -67,23 +69,25 @@ def tenants_by_aparment(request, number):
 #     queryset = Tenant.objects.all()
 #     serializer_class = TenantSerializer
 
-@api_view(["GET", "POST"])
-def apartment_list(request):
-    if request.method == "GET":
-        apartments = Apartment.objects.all()
-        serializer = ApartmentSerializer(apartments, many=True)
-        return Response(serializer.data)
+##### START OF APARTMENT VIEWS #####
 
-    elif request.method == "POST":
-        serializer = ApartmentSerializer(request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=201)
-        return Response(serializer.errors, status=400)
+# @api_view(["GET", "POST"])
+# def apartment_list(request):
+#     if request.method == "GET":
+#         apartments = Apartment.objects.all()
+#         serializer = ApartmentSerializer(apartments, many=True)
+#         return Response(serializer.data)
 
-# class ApartmentList(generics.ListCreateAPIView):
-#     queryset = Apartment.objects.all().order_by("number")
-#     serializer_class = ApartmentSerializer
+#     elif request.method == "POST":
+#         serializer = ApartmentSerializer(request.data)
+#         if serializer.is_valid():
+#             serializer.save()
+#             return Response(serializer.data, status=201)
+#         return Response(serializer.errors, status=400)
+
+class ApartmentList(generics.ListCreateAPIView):
+    queryset = Apartment.objects.all().order_by("number")
+    serializer_class = ApartmentSerializer
 
 
 @api_view(["GET", "PUT", "PATCH", "DELETE"])
@@ -117,7 +121,7 @@ def apartment_by_number(request, number):
 @api_view(["GET"])
 def apartments_by_end_date(request, end_date):
     try:
-        leases = Lease.objects.get(end_date=end_date)
+        leases = Lease.objects.get(end_date<=end_date)
     except:
        return Response(status=404)
    
@@ -127,6 +131,9 @@ def apartments_by_end_date(request, end_date):
             apartments.append(Apartment.objects.get(id=lease.apartment_id))
         serializer = ApartmentSerializer(apartments, many=True)
         return Response(serializer.data)
+
+
+##### START OF LEASE VIEWS #####
 
 @api_view(["GET", "POST"])
 def lease_list(request):
@@ -141,6 +148,10 @@ def lease_list(request):
             serializer.save()
             return Response(serializer.data, status=201)
         return Response(serializer.errors, status=400)
+
+class LeaseList(generics.ListCreateAPIView):
+    queryset = Lease.objects.all()
+    serializer_class = LeaseSerializer
 
 @api_view(["GET", "PUT", "PATCH", "DELETE"])
 def lease_by_tenant(request, name):

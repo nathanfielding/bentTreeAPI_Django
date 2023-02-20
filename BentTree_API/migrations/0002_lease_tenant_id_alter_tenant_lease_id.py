@@ -25,5 +25,10 @@ class Migration(migrations.Migration):
             model_name='apartment',
             name='property',
             field=models.CharField(max_length=50, null=False),
+        ),
+        migrations.AddField(
+            model_name='apartment',
+            name='max_occupancy',
+            field=models.IntegerField(null=False)
         )
     ]
