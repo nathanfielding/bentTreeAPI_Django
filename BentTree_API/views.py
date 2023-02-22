@@ -121,15 +121,15 @@ def apartment_by_number(request, number):
 @api_view(["GET"])
 def apartments_by_end_date(request, end_date):
     try:
-        leases = Lease.objects.get(end_date<=end_date)
-    except:
-       return Response(status=404)
+        leases = Lease.objects.filter(end_date__lte=end_date)
+        print("hello")
+    except Lease.DoesNotExist:
+       return Response({"error": "No leases found"}, status=404)
    
     if request.method == "GET":
-        apartments = []
-        for lease in leases:
-            apartments.append(Apartment.objects.get(id=lease.apartment_id))
+        apartments = Apartment.objects.filter(lease__id__in=leases)
         serializer = ApartmentSerializer(apartments, many=True)
+
         return Response(serializer.data)
 
 
@@ -175,3 +175,9 @@ def lease_by_tenant(request, name):
     elif request.method == "DELETE":
         lease.delete()
         return Response(status=204)
+
+# class LeasebyId(generics.RetrieveUpdateAPIView):
+#     queryset = Lease.objects.all()
+#     serializer_class = LeaseSerializer
+
+#     lookup_field = "id"

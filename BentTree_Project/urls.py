@@ -33,4 +33,6 @@ urlpatterns = [
     # lease endpoints
     path("leases/", views.LeaseList.as_view()),
     path("leases/by-name/<str:name>", views.lease_by_tenant),
+
+    # path("leases/<int:id>", views.LeasebyId.as_view())
 ]
