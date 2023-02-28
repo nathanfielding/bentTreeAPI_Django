@@ -29,6 +29,7 @@ urlpatterns = [
     path("apartments/", views.ApartmentList.as_view()),
     path("apartments/by-number/<str:number>/", views.apartment_by_number),
     path("apartments/by-end-date/<str:end_date>/", views.apartments_by_end_date),
+    path("apartments/by-bedrooms/<int:bedrooms>/", views.apartments_by_bedrooms),
 
     # lease endpoints
     path("leases/", views.LeaseList.as_view()),

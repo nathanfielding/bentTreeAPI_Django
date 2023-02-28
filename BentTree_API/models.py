@@ -4,7 +4,7 @@ class Apartment(models.Model):
     id = models.AutoField(primary_key=True)
     number = models.CharField(max_length=50, unique=True, null=False)
     property = models.CharField(max_length=50, null=False)
-    max_occupancy = models.IntegerField(null=False)
+    bedrooms = models.IntegerField(null=False)
     occupancy = models.IntegerField(null=False)
     rented_as = models.IntegerField(null=True)
 

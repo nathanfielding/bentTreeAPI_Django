@@ -132,7 +132,16 @@ def apartments_by_end_date(request, end_date):
 
         return Response(serializer.data)
 
+@api_view(["GET"])
+def apartments_by_bedrooms(request, bedrooms):
+    try:
+        apartments = Apartment.objects.filter(bedrooms=bedrooms)
+    except Apartment.DoesNotExist:
+        return Response({"error": "No apartments found"}, status=404)
 
+    if request.method == "GET":
+        serializer = ApartmentSerializer(apartments, many=True)
+        return Response(serializer.data, status=200)
 ##### START OF LEASE VIEWS #####
 
 @api_view(["GET", "POST"])
