@@ -1,36 +1,20 @@
 from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
-from .serializers import TenantSerializer, ApartmentSerializer, LeaseSerializer
-from .models import Tenant, Apartment, Lease
+from .serializers import TenantSerializer, ApartmentSerializer, LeaseSerializer, MaintenanceRequestSerializer
+from .models import Tenant, Apartment, Lease, MaintenanceRequest
 
-##### START OF TENANT VIEWS #####
-
-# @api_view(["GET", "POST"])
-# def tenant_list(request):
-#     if request.method == "GET":
-#         tenants = Tenant.objects.all()
-#         serializer = TenantSerializer(tenants, many=True)
-#         return Response(serializer.data)
-    
-#     elif request.method == "POST":
-#         serializer = TenantSerializer(data=request.data)
-#         if serializer.is_valid():
-#             serializer.save()
-#             return Response(serializer.data, status=201)
-#         return Response(serializer.errors, status=400)
-
+##### START OF TENANT VIEWS ###### 
 class TenantList(generics.ListCreateAPIView):
     queryset = Tenant.objects.all()
     serializer_class = TenantSerializer
-
 
 @api_view(["GET", "PUT", "PATCH", "DELETE"])
 def tenant_by_name(request, name):
     try:
         tenant = Tenant.objects.get(name=name)
     except:
-        return Response(status=404)
+        return Response({"error": f"No tenants with name {name} found"}, status=404)
 
     if request.method == "GET":
         serializer = TenantSerializer(tenant)
@@ -46,45 +30,15 @@ def tenant_by_name(request, name):
         tenant.delete()
         return Response(status=204)
 
-# class TenantByName(generics.RetrieveUpdateDestroyAPIView):
-#     queryset = Tenant.objects.all()
-#     serializer_class = TenantSerializer
-
-#     #required for when returning a single object of the queryset
-#     lookup_field = "name"
-
 @api_view(["GET"])
-def tenants_by_aparment(request, number):
-    try:
-        apartment = Apartment.objects.get(number=number)
-    except:
-        return Response(status=404)
-
+def tenants_by_apartment(request, number):
     if request.method == "GET":
-        tenants = Tenant.objects.filter(apartment_id=apartment.id)
+        tenants = Tenant.objects.filter(apartment__number=number)
         serializer = TenantSerializer(tenants, many=True)
         return Response(serializer.data)
 
-# class TenantsByApartment(generics.ListAPIView):
-#     queryset = Tenant.objects.all()
-#     serializer_class = TenantSerializer
 
 ##### START OF APARTMENT VIEWS #####
-
-# @api_view(["GET", "POST"])
-# def apartment_list(request):
-#     if request.method == "GET":
-#         apartments = Apartment.objects.all()
-#         serializer = ApartmentSerializer(apartments, many=True)
-#         return Response(serializer.data)
-
-#     elif request.method == "POST":
-#         serializer = ApartmentSerializer(request.data)
-#         if serializer.is_valid():
-#             serializer.save()
-#             return Response(serializer.data, status=201)
-#         return Response(serializer.errors, status=400)
-
 class ApartmentList(generics.ListCreateAPIView):
     queryset = Apartment.objects.all().order_by("number")
     serializer_class = ApartmentSerializer
@@ -95,7 +49,7 @@ def apartment_by_number(request, number):
     try:
         apartment = Apartment.objects.get(number=number)
     except:
-        return Response(status=404)
+        return Response({"error": f"No apartments with number {number} found"}, status=404)
 
     if request.method == "GET":
         serialzer = ApartmentSerializer(apartment)
@@ -112,24 +66,15 @@ def apartment_by_number(request, number):
         apartment.delete()
         return Response(status=204)
 
-# class ApartmentByNumber(generics.RetrieveDestroyAPIView):
-#     queryset = Apartment.objects.all()
-#     serializer_class = ApartmentSerializer
-
-#     lookup_field = "number"
-
 @api_view(["GET"])
-def apartments_by_end_date(request, end_date):
+def available_apartments(request, end_date):
     try:
-        leases = Lease.objects.filter(end_date__lte=end_date)
-        print("hello")
+        apartments = Apartment.objects.filter(lease__end_date__lte=end_date, tenant__is_renewing=False)
     except Lease.DoesNotExist:
        return Response({"error": "No leases found"}, status=404)
    
     if request.method == "GET":
-        apartments = Apartment.objects.filter(lease__id__in=leases)
         serializer = ApartmentSerializer(apartments, many=True)
-
         return Response(serializer.data)
 
 @api_view(["GET"])
@@ -137,37 +82,23 @@ def apartments_by_bedrooms(request, bedrooms):
     try:
         apartments = Apartment.objects.filter(bedrooms=bedrooms)
     except Apartment.DoesNotExist:
-        return Response({"error": "No apartments found"}, status=404)
+        return Response({"error": f"No apartments with {bedrooms} bedrooms found"}, status=404)
 
     if request.method == "GET":
         serializer = ApartmentSerializer(apartments, many=True)
         return Response(serializer.data, status=200)
+
 ##### START OF LEASE VIEWS #####
-
-@api_view(["GET", "POST"])
-def lease_list(request):
-    if request.method == "GET":
-        leases = Lease.objects.all()
-        serializer = LeaseSerializer(leases, many=True)
-        return Response(serializer.data)
-
-    elif request.method == "POST":
-        serializer = LeaseSerializer(request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=201)
-        return Response(serializer.errors, status=400)
-
 class LeaseList(generics.ListCreateAPIView):
     queryset = Lease.objects.all()
     serializer_class = LeaseSerializer
 
 @api_view(["GET", "PUT", "PATCH", "DELETE"])
-def lease_by_tenant(request, name):
+def lease_by_tenant_name(request, name):
     try:
         tenant = Tenant.objects.get(name=name)
     except:
-        return Response(status=404)
+        return Response({"error": f"No lease associated with {name} were found"}, status=404)
     
     lease = Lease.objects.get(tenant_id=tenant.id)
     if request.method == "GET":
@@ -185,8 +116,40 @@ def lease_by_tenant(request, name):
         lease.delete()
         return Response(status=204)
 
-# class LeasebyId(generics.RetrieveUpdateAPIView):
-#     queryset = Lease.objects.all()
-#     serializer_class = LeaseSerializer
 
-#     lookup_field = "id"
+
+##### START OF MAINTENANCE RECORD VIEWS #####
+class MaintenanceRecordList(generics.ListCreateAPIView):
+    queryset = MaintenanceRequest.objects.all().order_by("-open_date")
+    serializer_class = MaintenanceRequestSerializer
+
+@api_view(["GET", "PUT", "PATCH", "DELETE"])
+def maintenance_request_by_apartment(request, number):
+    try:
+        maintenance_request = MaintenanceRequest.objects.filter(apartment__number=number)
+    except Apartment.DoesNotExist:
+        return Response({"error": f"No maintenance requests associated with apartment {number} were found"}, status=404)
+
+    if request.method == "GET":
+        serializer = MaintenanceRequestSerializer(maintenance_request, many=True)
+        return Response(serializer.data, status=200)
+    elif request.method == "PUT" or request.method == "PATCH":
+        serializer = MaintenanceRequestSerializer(maintenance_request, request.data) if request.method == "PUT" else MaintenanceRequestSerializer(maintenance_request, request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=201)
+        return Response(serializer.errors, status=400)
+    elif request.method == "DELETE":
+        maintenance_request.delete()
+        return Response(status=204)
+
+@api_view(["GET"])
+def open_maintenance_requests(request):
+    try:
+        maintenance_requests = MaintenanceRequest.objects.filter(close_date=None)
+    except MaintenanceRequest.DoesNotExist:
+        return Response({"error": "No open maintenance requests were found"}, status=404)
+    
+    if request.method == "GET":
+        serializer = MaintenanceRequestSerializer(maintenance_requests, many=True)
+        return Response(serializer.data, status=200)

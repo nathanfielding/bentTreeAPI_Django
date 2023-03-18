@@ -23,17 +23,17 @@ urlpatterns = [
     # tenant endpoints
     path("tenants/", views.TenantList.as_view()),
     path("tenants/by-name/<str:name>/", views.tenant_by_name),
-    path("tenants/by-apartment/<str:number>/", views.tenants_by_aparment),
+    path("tenants/by-apartment/<str:number>/", views.tenants_by_apartment),
 
     # apartment endpoints
     path("apartments/", views.ApartmentList.as_view()),
     path("apartments/by-number/<str:number>/", views.apartment_by_number),
-    path("apartments/by-end-date/<str:end_date>/", views.apartments_by_end_date),
+    path("apartments/by-availability_date/<str:end_date>/", views.available_apartments),
     path("apartments/by-bedrooms/<int:bedrooms>/", views.apartments_by_bedrooms),
 
     # lease endpoints
     path("leases/", views.LeaseList.as_view()),
-    path("leases/by-name/<str:name>", views.lease_by_tenant),
+    path("leases/by-name/<str:name>", views.lease_by_tenant_name),
 
     # path("leases/<int:id>", views.LeasebyId.as_view())
 ]
